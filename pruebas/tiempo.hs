@@ -21,32 +21,31 @@ get uri = do
     Left _    -> ioError . userError $ "Failed to get " ++ show uri
     Right res -> return $ rspBody res 
 
-parseXML doc = readString [ withValidate no
-                          , withRemoveWS yes
-                          , withParseHTML yes
+parseXML doc = readString [ withParseHTML yes
                           , withWarnings no
                           ] doc
 
-func w weatherDataURL = do
+func = do
+        putStrLn "Ingrese la URL de la pagina"
+        weatherDataURL <- getLine
+        putStrLn "Ingrese la palabra a buscar"
+        w <- getLine
         doc <- retrieveWeatherData weatherDataURL
         xml <- return $ parseXML doc
 --    result <- runX (xml /> deep(hasText (isInfixOf "huracan")))
 --    result <- runX (xml >>> hasText(isInfixOf "huracan"))
-        result <- runX (xml //> hasText (isInfixOf w) >>> getText)
+--        contents <- runX . xshow $ xml
+        
+--        mapM_ putStrLn contents
+        result <- runX . xshow $ xml //> hasText (isInfixOf w)
+        mapM_ putStrLn result
 {-         case concat result of
             [] -> putStrLn "no funco algo"
             w -> print w-}
-        return result                                 
+        return result                          
 
-difference :: String -> String -> Int
-difference w1 w2 = undefined
-
-main = do 
-    putStrLn "Ingrese la URL de la pagina"
-    weatherDataURL <- getLine
-    putStrLn "Ingrese la palabra a buscar"
-    w <- getLine
-
+main = do v <- func
+          return v
 --pruebas raras, algunas funcan otras creo que no
 {-    doc <- retrieveWeatherData weatherDataURL
     xml <- return $ parseXML doc
@@ -57,9 +56,10 @@ main = do
          [] -> putStrLn "no funco algo"
          w -> print w
 -}
+{-
     v <- func w weatherDataURL
-    print v
-
+    print (concat v)
+-}
 --esto tira error de tipo! ver por que carajo
 {-    m <- newEmptyMVar
     forkIO (putMVar m (func w weatherDataURL))
