@@ -1,33 +1,44 @@
 import Text.XML.HXT.Core
-import Network.HTTP
 import Network.URI
 import Text.HandsomeSoup
 import Data.List
-
-weatherDataURL = "http://www.fceia.unr.edu.ar/lcc/jcc/2015/"
-
-retrieveWeatherData = do
-  case parseURI weatherDataURL of
-    Nothing  -> ioError . userError $ "Invalid URL"
-    Just uri -> get uri
+import Network.Curl
+import Text.XML.HXT.Curl
+import Text.XML.HXT.TagSoup
+import Control.Concurrent
+import Control.Concurrent.MVar
+import System.IO.Unsafe
 
 get uri = do
-  eresp <- simpleHTTP (Request uri GET [] "")
-  case eresp of
-    Left _    -> ioError . userError $ "Failed to get " ++ show uri
-    Right res -> return $ rspBody res 
+  eresp <- curlGetString uri []
+  return $ snd eresp
 
-parseXML doc = readString [ withValidate no
-                          , withRemoveWS yes
-                          , withParseHTML yes
-                          , withWarnings no
-                          ] doc
-            
+parseXML st = do readString [ withParseHTML      yes
+                            , withWarnings       no
+                            ] st
 
-main = do doc <- retrieveWeatherData
-          xml <- return $ parseXML doc
-          result <- runX (xml //> hasText (isInfixOf "Jornadas") >>> getText)
---          result <- runX (xml >>> css "body" >>> removeAllWhiteSpace //> getText)
-          case result of
-            [] -> putStrLn "no funco algo"
-            w -> print w
+
+getXML url = do doc <- get url
+                xml <- return $ parseXML doc
+                return xml  
+
+lookFunc url w = do xml <- getXML url
+                    result <- runX $ xml //> hasText (isInfixOf w) >>> getText
+                    threadDelay $ round $ 60*1000000
+                    return (length result, result)                  
+
+--                    print $ length result
+--                    mapM_ putStrLn result
+                    
+
+main = do putStrLn "Ingrese URL"
+          url <- getLine
+          putStrLn "Ingrese palabra a buscar"
+          w <- getLine   
+          m <- newEmptyMVar
+          forkIO $ putMVar m (lookFunc url w)
+          t <- takeMVar m
+          print (unsafePerformIO t)
+          main
+
+
