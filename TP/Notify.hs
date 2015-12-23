@@ -4,23 +4,28 @@ import Common
 import Find
 
 import System.Console.Readline
-import Control.Concurrent
-import Control.Concurrent.MVar
 import Data.Maybe
-
-type List = [(Notify,Answer)]
 {-
-newtype State = State { runState :: IO List }
+type List = [(Notify,Answer)]
+
+newtype State = State { runState :: List -> IO List }
 
 instance Monad State where
-    return x = State . return
-    m >>= f = (\l -> 
--}
-toSeconds :: Float -> Float
-toSeconds x = x*3600
+    return x = State (\l -> return l)
+    m >>= f = State (\l -> let v = runState l m
+                           in runState v f)
+                            
+class Monad m => MonadState m where
+    lookA :: Notify -> m Answer
+--    tick :: Notify -> m ()
 
-sleep :: Float -> IO ()
-sleep n = threadDelay $ round $ (toSeconds n)*1000000
+instance MonadState State where
+    lookA n = State (\l -> lookfor' n l)
+                    where lookfor' w (x:xs) | w == fst x = snd x
+                                            | w /= fst x = lookfor' w xs
+-}
+
+
 
 readK :: String -> IO String
 readK s = do
@@ -31,18 +36,19 @@ readK s = do
         Just a -> case a of
                       [] -> do putStrLn "Intente nuevamente"
                                readK s
-                      _ -> return a      
+                      _ -> return a 
+
 
 createNotify :: IO Notify
 createNotify = do 
     putStrLn "Ingrese Nombre de la Notificacion"
-    name <- readK ">"
+    name <- getLine
     putStrLn "Ingrese tiempo de busqueda deseado en hs"
-    t <- readK ">"
+    t <- getLine
     let time = read t :: Float
     putStrLn "Ingrese palabra a buscar"
-    word <- readK ">"
+    word <- getLine
     putStrLn "Ingrese url"
-    url <- readK ">"
-    return (N name time word url)
+    url <- getLine
+    return (N name time word url 0)
 
