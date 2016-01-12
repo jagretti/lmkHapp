@@ -5,27 +5,6 @@ import Find
 
 import System.Console.Readline
 import Data.Maybe
-{-
-type List = [(Notify,Answer)]
-
-newtype State = State { runState :: List -> IO List }
-
-instance Monad State where
-    return x = State (\l -> return l)
-    m >>= f = State (\l -> let v = runState l m
-                           in runState v f)
-                            
-class Monad m => MonadState m where
-    lookA :: Notify -> m Answer
---    tick :: Notify -> m ()
-
-instance MonadState State where
-    lookA n = State (\l -> lookfor' n l)
-                    where lookfor' w (x:xs) | w == fst x = snd x
-                                            | w /= fst x = lookfor' w xs
--}
-
-
 
 readK :: String -> IO String
 readK s = do
@@ -42,13 +21,13 @@ readK s = do
 createNotify :: IO Notify
 createNotify = do 
     putStrLn "Ingrese Nombre de la Notificacion"
-    name <- getLine
+    name <- readK ">>"
     putStrLn "Ingrese tiempo de busqueda deseado en hs"
-    t <- getLine
+    t <- readK ">>"
     let time = read t :: Float
     putStrLn "Ingrese palabra a buscar"
-    word <- getLine
+    word <- readK ">>"
     putStrLn "Ingrese url"
-    url <- getLine
+    url <- readK ">>"
     return (N name time word url 0)
 

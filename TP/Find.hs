@@ -9,32 +9,6 @@ import Data.List
 --Prueba de poner tiempo!
 import Data.Time
 
-import Data.Map (Map)
-import qualified Data.Map as Map
-
-type List = Map Notify Answer
-newtype ListState = ListState (MVar List)
-
-new :: IO ListState
-new = do
-    m <- newMVar Map.empty
-    return (ListState m)
-
-addTo :: Notify -> Answer -> ListState -> IO ()
-addTo n a (ListState m) = do
-    list <- takeMVar m
-    putMVar m (Map.insert n a list)
-
-lookup :: ListState -> Notify -> IO (Maybe Answer)
-lookup (ListState m) n = do
-    list <- takeMVar m
-    putMVar m list
-    return (Map.lookup n list)
-
-printList :: ListState -> IO ()
-printList (ListState m) = do x <- takeMVar m
-                             print x
-
 
 toSeconds :: Float -> Float
 toSeconds x = x*3600
@@ -61,21 +35,15 @@ getXML url = do
     doc <- getPage url
     xml <- return $ parseXML doc
     return xml
-{-
-tickN :: Notify -> IO Notify
-tickN (N m a b c n) = return (N m a b c (n+1))
--}
+
 --search :: Notify -> IO Answer
-search p = do
+searchWord p = do
     xml <- getXML $ url p
     result <- runX $ xml //> hasText (isInfixOf (request p)) >>> getText
---    print result
---    t <- getCurrentTime
---    print t
     case result of
         [] -> do print $ "Intente "++ name p
                  sleep $ time p
-                 search p
+                 searchWord p
         xs -> print xs
 --        xs -> return (A (length result) result)  
 

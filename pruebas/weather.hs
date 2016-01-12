@@ -60,7 +60,7 @@ getWeather = atTag "current_observation" >>>
 
 -- GHCi test:
 -- Main> retrieveWeatherData >>= \ doc -> runX (parseXML doc >>> getWeather)
-
+{-
 main = do
   doc    <- retrieveWeatherData
   xml    <- return $ parseXML doc
@@ -68,3 +68,4 @@ main = do
   case result of
     []  -> putStrLn "Unable to parse weather data."
     w:_ -> print w
+-}
