@@ -1,0 +1,5 @@
+new Parcial
+    get text where
+    href = Parcial
+    every 0
+    from url

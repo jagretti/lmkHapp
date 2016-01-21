@@ -1,20 +1,24 @@
 module Common where
 
-import Data.Time
 
-type Id = Int
+data Attr = Href
+          | Text
+          | Src
+          | Id 
+          | Class deriving Show
 
-data Comm = New 
-          | Quit
+data Comm = New
+          | Load 
           | Help
+          | Quit
 
-data Notify = N { name :: String
-                , time :: Float
-                , request :: String
-                , url :: String 
-                , num :: Int } deriving (Show,Ord,Eq)
+data Notification = N { name :: String
+                      , time :: Int
+                      , att :: Attr
+                      , cond :: (Attr, String)
+                      , url :: String } deriving Show
 
-data Answer = A { times :: Int
+data Answer = A { nameN :: String
                 , statements :: [String] } deriving Show
 
 
