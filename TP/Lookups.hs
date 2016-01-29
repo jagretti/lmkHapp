@@ -19,55 +19,46 @@ translate a = case a of
             Id -> "id"
             Text -> "text"
 
---CONSIGUE Attr (menos Text) CON DETERMINADO TEXTO VISIBLE                
-lookUpOne n page = do
+tags :: Tags -> String
+tags t = case t of
+         "any" -> "*"
+         xs -> xs
+
+--Consigue Attr (menos Text) con determinado texto visible               
+lookUpAtT n page = do
     let at = translate $ att n
---    t <- runX $ page //> hasAttr at >>> (deep (hasText (isInfixOf (snd $ cond n)))) &&& getAttrValue at   --Intento para que solo salga el Attr deseado 
-    t <- runX $ page //> hasAttr at >>> ((deep (hasText (isInfixOf (snd $ cond n))) >>> getText) &&& getAttrValue at)
+    t <- runX $ page >>> css (tags (tag n)) >>> hasAttr at >>> (deep (hasText (isInfixOf (snd $ cond n))) &&& getAttrValue at)
+    let m = map (\x -> snd x) t
+    print m
+
+--Consigue Atributo con condicion de otro atributo
+lookUpAtAt n page = do
+    let at = translate $ att n
+    t <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") ! at
     print t
 
---CONSIGUE TEXTOS QUE DIGAN DETERMINADA COSA
-lookUpTwo n page = do
-    u <- runX $ page //> hasText (isInfixOf (snd $ cond n)) >>> getText
+--Consigue Texto con determinado Texto (cueck)
+lookUpTT n page = do
+    u <- runX $ page >>> css (tags (tag n)) //> hasText (isInfixOf (snd $ cond n)) >>> getText
     print u
 
-
-lookUpThree n page = do
-    let t1 = translate (fst $ cond n)
-    let t2 = cond n
-    u <- runX $ page >>> deep (hasAttrValue "class" (=="w3-right toptext w3-wide")) //> getText
+--Consigue Texto con determinado atributo
+lookUpTAt n page = do
+    u <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") //> getText
     print u
 
---main = do
-{-
-    t <- getTime $ Monotonic
-    threadDelay $ 60 * 1000000
-    t' <- getTime $ Monotonic
-    print (sec t' - sec t)
-    
-
-    url <- getLine
+--Hace la seleccion de lookUps solo
+bigLookUp n url = do
     page <- getXML url
-    t <- runX $ page //> hasAttr "href" >>> (deep (hasText (isInfixOf "Stream"))) &&& getAttrValue "href" -- consigue href con determinado texto y el mapM imprime solo href
-    mapM_ (\x -> putStrLn (snd x)) t
-    putStrLn "href con determinado texto"
-    print t
+    let at = att n
+    let atc = fst (cond n)
+    case at of
+        Text -> case atc of
+                    Text -> lookUpTT n page
+                    _ -> lookUpTAt n page
+        _ -> case atc of
+                Text -> lookUpAtT n page
+                _ -> lookUpTT n page
+         
 
-    t <- runX $ page //> hasAttr "href" >>> ((deep (hasText (isInfixOf "Stream")) >>> getText) &&& getAttrValue "href") -- consigue href con determinado texto
-
-    u <- runX $ page //> hasText (isInfixOf "Parcial") >>> getText -- consigue el texto que diga tal cosa
-    putStrLn "texto con determinado texto"
-    print u 
--}    
-    
-
-
-
-
-
-
-
-
-
-   
 
