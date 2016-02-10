@@ -1,4 +1,4 @@
-module Notification where
+module Pretty where
 
 import Common
 import Ghtml

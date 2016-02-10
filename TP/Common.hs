@@ -1,6 +1,5 @@
 module Common where
 
-
 type Tags = String
 
 data Attr = Href
@@ -9,9 +8,9 @@ data Attr = Href
           | Id 
           | Class deriving Show
 
-data Comm = Load 
+data Comm = Load String
           | Help
-          | Quit
+          | Quit deriving Show
 
 data Notification = N { name :: String
                       , time :: Int

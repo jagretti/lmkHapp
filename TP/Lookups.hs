@@ -2,7 +2,7 @@ module Lookups where
 
 import Common
 import Ghtml
-import Notification
+import Pretty
 
 import Network.Curl
 import Text.HandsomeSoup
@@ -29,36 +29,45 @@ lookUpAtT n page = do
     let at = translate $ att n
     t <- runX $ page >>> css (tags (tag n)) >>> hasAttr at >>> (deep (hasText (isInfixOf (snd $ cond n))) &&& getAttrValue at)
     let m = map (\x -> snd x) t
-    print m
+    return m
 
 --Consigue Atributo con condicion de otro atributo
 lookUpAtAt n page = do
     let at = translate $ att n
     t <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") ! at
-    print t
+    return t
 
 --Consigue Texto con determinado Texto (cueck)
 lookUpTT n page = do
-    u <- runX $ page >>> css (tags (tag n)) //> hasText (isInfixOf (snd $ cond n)) >>> getText
-    print u
+    u <- runX $ page >>> css (tags (tag n)) >>> hasText (isInfixOf (snd $ cond n)) >>> getText
+    return u
 
 --Consigue Texto con determinado atributo
 lookUpTAt n page = do
     u <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") //> getText
-    print u
+    return u
 
 --Hace la seleccion de lookUps solo
-bigLookUp n url = do
-    page <- getXML url
+bigLookUp n = do
+    page <- getXML $ url n
     let at = att n
     let atc = fst (cond n)
     case at of
         Text -> case atc of
-                    Text -> lookUpTT n page
-                    _ -> lookUpTAt n page
+                Text -> do x <- lookUpTT n page
+                           return x
+                _ -> do x <- lookUpTAt n page
+                        return x
         _ -> case atc of
-                Text -> lookUpAtT n page
-                _ -> lookUpTT n page
-         
+             Text -> do x <- lookUpAtT n page
+                        return x
+             _ -> do x <- lookUpAtAt n page
+                     return x
+{-         
+                           case x of
+                               [] -> do sleep 1
+                                        print "esperando"
+                                        bigLookUp n
+                               m -> return m
 
-
+-}

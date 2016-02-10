@@ -1,5 +1,6 @@
-new Parcial
-    get text where
-    href = Parcial
+new Groupon
+    get href where
+    text = Atención
+    tag = any
     every 0
-    from url
+    from https://www.groupon.com.ar/getaways
