@@ -17,7 +17,8 @@ data Notification = N { name :: String
                       , att :: Attr
                       , cond :: (Attr, String)
                       , tag :: Tags
-                      , url :: String } deriving (Show,Eq)
+                      , url :: String
+                      , ntype :: String } deriving (Show,Eq)
 
 data Answer = A { nameN :: String
                 , statements :: [String] } deriving Show

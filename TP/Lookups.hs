@@ -23,6 +23,7 @@ tags :: Tags -> String
 tags t = case t of
          "any" -> "*"
          xs -> xs
+                
 
 --Consigue Attr (menos Text) con determinado texto visible               
 lookUpAtT n page = do
@@ -55,7 +56,7 @@ bigLookUp n = do
     let atc = fst (cond n)
     case at of
         Text -> case atc of
-                Text -> do x <- lookUpTT n page 
+                Text -> do x <- lookUpTT n page
                            return (f (A (name n) x))
                 _ -> do x <- lookUpTAt n page
                         return (f (A (name n) x))

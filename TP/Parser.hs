@@ -9,7 +9,7 @@ import Network.URI (parseURI, uriToString)
 
 untyped :: TokenParser u
 untyped = makeTokenParser (haskellStyle { identStart = letter <|> char '_',
-                                          reservedNames = ["get","where","new","every","from","tag"],
+                                          reservedNames = ["get","where","new","every","from","tag","type"],
                                           opLetter = return ' ' })
 
 parseComm :: Parser a -> IO (Either ParseError a)
@@ -81,8 +81,11 @@ parseNot = do
     reserved untyped "every"
     time <- digit
     separator
+    reserved untyped "type"
+    ty <- many1 letter
+    separator
     reserved untyped "from"
     url <- manyTill anyChar newline
-    return (N name (digitToInt time) attr (attrC,cond) ct url)
+    return (N name (digitToInt time) attr (attrC,cond) ct url ty)
     
 

@@ -9,14 +9,19 @@ import Pretty
 import Control.Concurrent
 import Control.Monad.State
 import Data.List
+import Language.Haskell.TH.Syntax
+import Control.Error
+import Control.Monad
+import Control.Monad.Trans
+import System.Exit
 
 type Error = String
 type Tup = (Notification,Int)
 type Env = [Tup]
 
-n1 = N "ingreso" 0 Href (Text,"Horarios") "any" "http://web.fceia.unr.edu.ar/en/gacetillas/698-horarios-de-comisiones-de-ingreso-2016.html"
-n5 = N "ole" 0 Text (Text,"Northcutt") "any" "http://www.ole.com.ar/"
-n6 = N "nodejs" 0 Text (Text,"utilitarian") "any" "https://openclassrooms.com/courses/ultra-fast-applications-using-node-js/node-js-what-is-it-for-exactly"
+n1 = N "ingreso" 10 Href (Text,"Horarios") "any" "http://web.fceia.unr.edu.ar/en/gacetillas/698-horarios-de-comisiones-de-ingreso-2016.html"
+n5 = N "ole" 11 Text (Text,"Northcutt") "any" "http://www.ole.com.ar/"
+n6 = N "nodejs" 30 Text (Text,"utilitarian") "any" "https://openclassrooms.com/courses/ultra-fast-applications-using-node-js/node-js-what-is-it-for-exactly"
 
 {-
 newtype QSMonad a = QSM { runQSM :: Env -> Either Error (a,Env) }
@@ -46,22 +51,29 @@ instance MonadState QSMonad where
 io :: IO a -> StateT Env IO a
 io = liftIO
 
+check xs = when (xs == []) exitSuccess
+
 timePQ :: StateT Env IO ()
 timePQ = forever $ do 
     xs <- get
-    io $ print (map (\x-> snd x) xs)
+--    io $ print (map (\x-> snd x) xs)
+    io $ check xs
     t <- getMinPQ
     diffAll t
     ys <- get
-    io $ print (map (\x-> snd x) ys)
-    io $ do threadDelay $ (time (fst t)) * 100000
-            t <- bigLookUp (fst t)
-            case t of
-                A n [] -> print "Vacio"
-                A n s -> print s
-    setDefault t
+--    io $ print (map (\x-> snd x) ys)
+    ans <- io (waitAndLook t)
+    case ans of
+        A n [] -> do setDefault t
+--                     io $ print "no encontre nada, tengo que esperar" 
+                     return ()
+        A n xs -> do io (print xs)
+                     deleteT t
     
-
+waitAndLook (n,t) = do 
+    threadDelay $ t * 60000000
+    r <- bigLookUp n
+    return r
         
 diffAll :: Tup -> StateT Env IO ()
 diffAll (n,t) = do
@@ -84,57 +96,12 @@ deleteT t = do modify (\s -> del t s)
           del t (x:xs) = if t == x then xs else x:(del t xs)
 
 setDefault :: Tup -> StateT Env IO ()
-setDefault (n,t) = do 
-    modify (\s -> map (\(n1,t1) -> if n == n1 then (n1,time n1) else (n1,t1)) s)
+setDefault t = do 
+    modify (\s -> deflt t s)
     return ()
+        where deflt t [] = []
+              deflt t (x:xs) = if t == x then (fst t,time (fst t)):xs else x:(deflt t xs)  
 
-main = runStateT timePQ [(n1,10),(n6,11),(n6,30)] >> return ()
+--main = runStateT timePQ [(n1,10),(n5,11),(n6,30)] >> return () 
 
-{-
-timePQ :: StateT Env IO ()
-timePQ = do
-    (x:xs) <- get
-    diffFirst 
-    io $ threadDelay $ (time (fst x)) * 100000
-    io $ do r <- bigLookUp (fst x)
-            case (statements r) of
-                [] -> print "vacio"
-                xs -> print xs
-     
-diffFirst :: StateT Env IO ()
-diffFirst = do
-    (x:xs) <- get
-    ys <- mapM_ (\e -> (snd e) - (snd x)) xs
-    return () 
--}    
-
-
-{-
-newtype QSMonad s = QSM { runQSM :: s -> IO (Either Error s) }
-
-instance Monad QSMonad where
-    return x = QSM (\s -> return $ Right s)
-    h >>= f = QSM (\s -> do eith_v <- runQSM h s
-                            case eith_v of
-                                Right s' -> f s' -- Por que no funciona aca!!!
-                                Left err -> return $ Left err) 
--}
-
-{-
-newtype QSMonad s = QSM { runQSM :: s -> (Either Error s) }
-
-instance Monad QSMonad where
-    return = QSM (\s -> Right s)
-    h >>= f = QSM (\s -> do eith_v <- runQSM h
-                            case eith_v of
-                                Right s' -> runQSM (f s')
-                                Left err -> return $ Left err) 
-
-class Monad m => MonadQS m where
-    goLast :: m ()
-    showList :: m ()
-
-instance MonadQS QSMonad where 
-    goLast = 
--}
         

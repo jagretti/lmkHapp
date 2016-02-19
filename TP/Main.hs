@@ -5,6 +5,7 @@ import Ghtml
 import Pretty
 import Parser
 import Lookups
+import Notification
 
 import Text.ParserCombinators.Parsec
 import Text.Parsec.Token
@@ -14,6 +15,7 @@ import Control.Monad
 import System.Environment
 import Data.Time.Clock
 import Data.Time.Calendar
+import Control.Monad.State
 
 --comm = [(Load,"Escribe :l o :load seguido del nombre del archivo del archivo de notificacion"),
   --      (Help,"Se muestra la ayuda"),
@@ -39,11 +41,19 @@ main :: IO ()
 main = do
     args <- getArgs
     p <- parseFromFile parseAll (unwords args)
-    print p
+    case p of
+        Left err -> print err    
+        Right xs -> do let list = map (\n -> (n,time n)) xs
+                       runStateT timePQ list >> return () 
+
+
+
+{-
     case p of
         Left err -> print err
         Right xs -> do l <- bigLookUp (xs !! 1)    
                        print l
+-}
 {-    
     t <- date
     time <- getCurrentTime
