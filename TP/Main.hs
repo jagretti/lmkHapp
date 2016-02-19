@@ -6,15 +6,14 @@ import Pretty
 import Parser
 import Lookups
 
-import Control.Concurrent
-import Control.Concurrent.MVar
 import Text.ParserCombinators.Parsec
 import Text.Parsec.Token
 import Text.Parsec.Language
-import Text.HandsomeSoup
-import Text.XML.HXT.Core
 import Data.List
 import Control.Monad
+import System.Environment
+import Data.Time.Clock
+import Data.Time.Calendar
 
 --comm = [(Load,"Escribe :l o :load seguido del nombre del archivo del archivo de notificacion"),
   --      (Help,"Se muestra la ayuda"),
@@ -38,12 +37,24 @@ n15 = N "yahoo1" 0 Href (Text,"Yahoo") "any" "https://espanol.yahoo.com/"
 
 main :: IO ()
 main = do
-    welcome
-    go
-    
-        
+    args <- getArgs
+    p <- parseFromFile parseAll (unwords args)
+    print p
+    case p of
+        Left err -> print err
+        Right xs -> do l <- bigLookUp (xs !! 1)    
+                       print l
+{-    
+    t <- date
+    time <- getCurrentTime
+    print $ utctDayTime time -- Esto da la hora en segundos
+    print $ utctDayTime (addUTCTime 60 time) -- Esto suma segundos
+-}
+--date :: IO (Integer,Int,Int) -- :: (year,month,day)
+--date = getCurrentTime >>= return . showGregorian . utctDay --Esto da la fecha exacta! Para escribir en el log o por pantalla
 
 
+{-
 welcome = do 
     putStrLn "--- Bienvenido!"
     putStrLn "--- Para ayuda escriba :help"
@@ -53,37 +64,18 @@ go = do
     c <- parseComm parseC
     case c of
         Right t -> case t of
-                       Load s -> do result <- parseFromFile parseNot s
+                       Load s -> do result <- parseFromFile parseAll s
                                     case result of
                                         Left err -> print err
-                                        Right notf -> do t <- bigLookUp notf
-                                                         print t
-                                                         go
+                                        Right xs -> print xs
                        Help -> do print "help"
                                   go
                        Quit -> return ()
         Left err -> print err
                          
+-}
 
 
-{-
-forkChild m n = do
-    forkIO $ putMVar m (bigLookUp n)
-    r <- tryTakeMVar m
-    case r of
-        Nothing -> print "algo no anduvo"
-        [] -> do sleep $ time n
-                 print "espere un toque!"
-                 forkChild m n
-        xs -> print xs
--}
-{-
-   result <- parseFromFile parseNot "example1.txt" 
-   case result of
-       Left err -> print err
-       Right notf -> print notf
--}
-   
 
 
 

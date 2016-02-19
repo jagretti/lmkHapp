@@ -50,8 +50,13 @@ separator =
            return () 
     <|> do tab
            return ()
+    <|> do spaces
+           return ()
 
-
+parseAll :: Parser [Notification]
+parseAll = do xs <- sepBy parseNot separator
+              return xs
+               
 
 parseNot :: Parser Notification
 parseNot = do
@@ -63,10 +68,10 @@ parseNot = do
     separator
     reserved untyped "where"
     separator
-    attrC <- parseAttr
+    attrC <- parseAttr <?> "Erraste en el atributo"
     space
     reservedOp untyped "="
-    cond <- many1 letter
+    cond <- manyTill anyChar newline
     separator
     tag <- many1 letter
     space

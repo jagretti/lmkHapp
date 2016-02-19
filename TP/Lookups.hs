@@ -8,7 +8,7 @@ import Network.Curl
 import Text.HandsomeSoup
 import Text.XML.HXT.Core
 import Data.List
-import System.Clock
+--import System.Clock
 import Control.Concurrent
 
 translate :: Attr -> String
@@ -39,7 +39,7 @@ lookUpAtAt n page = do
 
 --Consigue Texto con determinado Texto (cueck)
 lookUpTT n page = do
-    u <- runX $ page >>> css (tags (tag n)) >>> hasText (isInfixOf (snd $ cond n)) >>> getText
+    u <- runX $ page >>> css (tags (tag n)) //> hasText (isInfixOf (snd $ cond n)) >>> getText
     return u
 
 --Consigue Texto con determinado atributo
@@ -48,21 +48,23 @@ lookUpTAt n page = do
     return u
 
 --Hace la seleccion de lookUps solo
+bigLookUp :: Notification -> IO Answer
 bigLookUp n = do
     page <- getXML $ url n
     let at = att n
     let atc = fst (cond n)
     case at of
         Text -> case atc of
-                Text -> do x <- lookUpTT n page
-                           return x
+                Text -> do x <- lookUpTT n page 
+                           return (f (A (name n) x))
                 _ -> do x <- lookUpTAt n page
-                        return x
+                        return (f (A (name n) x))
         _ -> case atc of
              Text -> do x <- lookUpAtT n page
-                        return x
+                        return (f (A (name n) x))
              _ -> do x <- lookUpAtAt n page
-                     return x
+                     return (f (A (name n) x))
+    where f = cleanAnswer
 {-         
                            case x of
                                [] -> do sleep 1

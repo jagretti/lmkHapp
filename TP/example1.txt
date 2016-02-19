@@ -1,6 +1,27 @@
 new Groupon
     get href where
-    text = Atención
+    tex = Atención
     tag = any
     every 0
     from https://www.groupon.com.ar/getaways
+
+new Parcial
+    get text where
+    text = Parcial
+    tag = any
+    every 0
+    from http://www.fceia.unr.edu.ar/lcc/r313/
+
+new Clima
+    get text where
+    text = Lluvias
+    tag = any
+    every 0
+    from http://www.smn.gov.ar/?mod=pron&id=4&provincia=Santa%20Fe&ciudad=Rosario
+
+new WikiHow
+    get class where
+    id = nav_messages
+    tag = any
+    every 0
+    from http://es.wikihow.com/decidirte-entre-la-PS4-y-el-Xbox-One

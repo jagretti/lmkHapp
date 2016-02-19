@@ -6,7 +6,7 @@ data Attr = Href
           | Text
           | Src
           | Id 
-          | Class deriving Show
+          | Class deriving (Show,Eq)
 
 data Comm = Load String
           | Help
@@ -17,7 +17,7 @@ data Notification = N { name :: String
                       , att :: Attr
                       , cond :: (Attr, String)
                       , tag :: Tags
-                      , url :: String } deriving Show
+                      , url :: String } deriving (Show,Eq)
 
 data Answer = A { nameN :: String
                 , statements :: [String] } deriving Show

@@ -7,7 +7,7 @@ import Text.XML.HXT.Core
 import Network.Curl
 import Data.List
 --Prueba de poner tiempo!
-import System.Clock
+--import System.Clock
 
 sleep :: Int -> IO ()
 sleep n = threadDelay $ n * 1000000

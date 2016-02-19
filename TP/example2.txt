@@ -1,6 +1,0 @@
-new Parcial
-    get text where
-    text = Parcial
-    tag = any
-    every 0
-    from http://www.fceia.unr.edu.ar/lcc/r313/
