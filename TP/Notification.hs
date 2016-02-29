@@ -3,77 +3,81 @@ module Notification where
 import Common
 import Ghtml
 import Lookups
-import Parser
-import Pretty
+import TypeN
 
 import Control.Concurrent
 import Control.Monad.State
 import Data.List
-import Language.Haskell.TH.Syntax
-import Control.Error
 import Control.Monad
 import Control.Monad.Trans
 import System.Exit
+import Network.Curl
+import Network.Curl.Debug
 
 type Error = String
 type Tup = (Notification,Int)
 type Env = [Tup]
 
-n1 = N "ingreso" 10 Href (Text,"Horarios") "any" "http://web.fceia.unr.edu.ar/en/gacetillas/698-horarios-de-comisiones-de-ingreso-2016.html"
-n5 = N "ole" 11 Text (Text,"Northcutt") "any" "http://www.ole.com.ar/"
-n6 = N "nodejs" 30 Text (Text,"utilitarian") "any" "https://openclassrooms.com/courses/ultra-fast-applications-using-node-js/node-js-what-is-it-for-exactly"
-
-{-
-newtype QSMonad a = QSM { runQSM :: Env -> Either Error (a,Env) }
-
-instance Monad QSMonad where
-    return x = QSM (\s -> Right (x,s))
-    QSM h >>= f = QSM (\s -> case h s of
-                                 Left err -> Left err
-                                 Right (a,s') -> runQSM (f a) s')
-
-class Monad m => MonadState m where
-    getMin :: m (Notification,Int) 
-    diffAll :: Tup -> m ()
-    setDefault :: Tup -> m () 
-
-instance MonadState QSMonad where
-    getMin = QSM (\s -> findMinL s >>= (\x -> Right (x,s)))
-                where findMinL [] = Left "Error"
-                      findMinL [x] = Right x
-                      findMinL (x:y:xs) = if snd x <= snd y then findMinL (x:xs) else findMinL (y:xs)
-    diffAll t = QSM (\s -> Right ((),f t s)) 
-                   where f t [] = []
-                         f (n,t) ((n1,t1):xs) = if n == n1 then f (n,t) xs else (n1,t1-t):(f (n,t) xs)    
--}
-
-
-io :: IO a -> StateT Env IO a
-io = liftIO
-
-check xs = when (xs == []) exitSuccess
 
 timePQ :: StateT Env IO ()
-timePQ = forever $ do 
+timePQ = do 
+    ys <- get
+    fstTime ys
+    forever $ do
     xs <- get
---    io $ print (map (\x-> snd x) xs)
+    io $ print xs
     io $ check xs
     t <- getMinPQ
     diffAll t
     ys <- get
---    io $ print (map (\x-> snd x) ys)
     ans <- io (waitAndLook t)
     case ans of
-        A n [] -> do setDefault t
---                     io $ print "no encontre nada, tengo que esperar" 
-                     return ()
-        A n xs -> do io (print xs)
-                     deleteT t
-    
+        Left error -> handleError t error
+        Right (A n []) -> do setDefault t
+                             io $ print ("no encontre nada de "++n)
+                             return ()
+        Right (A n xs) -> do io $ okAnswer (fst t) (A n xs)
+                             io $ print ("borro por que ya encontre "++n)
+                             deleteT t
+
+handleError :: Tup -> CurlCode -> StateT Env IO ()
+handleError t err = do
+    let n = fst t
+    case err of
+        CurlRecvError -> do io $ errorT n err --DEBERIA DEFAULTEAR EL TIME....VER!!! O SINO PROBAR UNA VEZ MAS Y BORRARLA.
+                            return ()
+        other -> do io $ errorT n other
+                    deleteT t
+                    return () 
+
+io :: IO a -> StateT Env IO a
+io = liftIO
+
+check :: Env -> IO ()
+check xs = when (xs == []) exitSuccess
+
+fstTime :: Env -> StateT Env IO ()
+fstTime [] = return ()
+fstTime (x:xs) = do
+    n <- io $ bigLookUp (fst x)
+    case n of
+        Left error -> do handleError x error
+                         fstTime xs
+        Right (A np []) -> do io $ print ("no recibi nada de "++np)
+                              fstTime xs
+        Right (A np ys) -> do io $ okAnswer (fst x) (A np ys)
+                              io $ print ("borro "++np++" la encontre")
+                              deleteT x
+                              fstTime xs
+
+waitAndLook :: Tup -> IO (Either CurlCode Answer)    
 waitAndLook (n,t) = do 
     threadDelay $ t * 60000000
+    debug "hollllla"
     r <- bigLookUp n
-    return r
+    case r of
+        Right a -> return $ Right a
+        Left err -> return $ Left err
         
 diffAll :: Tup -> StateT Env IO ()
 diffAll (n,t) = do
@@ -101,7 +105,5 @@ setDefault t = do
     return ()
         where deflt t [] = []
               deflt t (x:xs) = if t == x then (fst t,time (fst t)):xs else x:(deflt t xs)  
-
---main = runStateT timePQ [(n1,10),(n5,11),(n6,30)] >> return () 
 
         

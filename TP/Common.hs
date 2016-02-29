@@ -8,9 +8,12 @@ data Attr = Href
           | Id 
           | Class deriving (Show,Eq)
 
-data Comm = Load String
-          | Help
-          | Quit deriving Show
+data NType = Log
+           | Print 
+           | Mail deriving (Show,Eq)
+
+data WaitT = T { hours :: Int
+               , minutes :: Int } deriving (Show,Eq)
 
 data Notification = N { name :: String
                       , time :: Int
@@ -18,9 +21,10 @@ data Notification = N { name :: String
                       , cond :: (Attr, String)
                       , tag :: Tags
                       , url :: String
-                      , ntype :: String } deriving (Show,Eq)
+                      , ntype :: NType } deriving (Show,Eq)
 
 data Answer = A { nameN :: String
                 , statements :: [String] } deriving Show
+
 
 

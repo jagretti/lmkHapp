@@ -8,8 +8,6 @@ import Network.Curl
 import Text.HandsomeSoup
 import Text.XML.HXT.Core
 import Data.List
---import System.Clock
-import Control.Concurrent
 
 translate :: Attr -> String
 translate a = case a of
@@ -49,28 +47,29 @@ lookUpTAt n page = do
     return u
 
 --Hace la seleccion de lookUps solo
-bigLookUp :: Notification -> IO Answer
+bigLookUp :: Notification -> IO (Either CurlCode Answer)
 bigLookUp n = do
     page <- getXML $ url n
+    case page of
+        Right p -> do ans <- go n p
+                      return $ Right ans
+        Left r -> return $ Left r
+
+go n p = do
     let at = att n
     let atc = fst (cond n)
     case at of
         Text -> case atc of
-                Text -> do x <- lookUpTT n page
+                Text -> do x <- lookUpTT n p
                            return (f (A (name n) x))
-                _ -> do x <- lookUpTAt n page
+                _ -> do x <- lookUpTAt n p
                         return (f (A (name n) x))
         _ -> case atc of
-             Text -> do x <- lookUpAtT n page
+             Text -> do x <- lookUpAtT n p
                         return (f (A (name n) x))
-             _ -> do x <- lookUpAtAt n page
+             _ -> do x <- lookUpAtAt n p
                      return (f (A (name n) x))
     where f = cleanAnswer
-{-         
-                           case x of
-                               [] -> do sleep 1
-                                        print "esperando"
-                                        bigLookUp n
-                               m -> return m
 
--}
+
+

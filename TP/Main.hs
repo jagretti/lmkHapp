@@ -13,13 +13,8 @@ import Text.Parsec.Language
 import Data.List
 import Control.Monad
 import System.Environment
-import Data.Time.Clock
-import Data.Time.Calendar
 import Control.Monad.State
 
---comm = [(Load,"Escribe :l o :load seguido del nombre del archivo del archivo de notificacion"),
-  --      (Help,"Se muestra la ayuda"),
-    --    (Quit,"Salir")]
 
 n1 = N "ingreso" 0 Href (Text,"Horarios") "any" "http://web.fceia.unr.edu.ar/en/gacetillas/698-horarios-de-comisiones-de-ingreso-2016.html"
 n2 = N "Diario-Sport" 0 Href (Text,"marca") "any" "http://www.sport.es/es/noticias/barca/dia-que-cristiano-ronaldo-hizo-traductor-messi-neymar-4828356"
