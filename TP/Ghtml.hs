@@ -6,14 +6,6 @@ import Control.Concurrent
 import Text.XML.HXT.Core
 import Network.Curl
 import Data.List
---Prueba de poner tiempo!
---import System.Clock
-
-minToSec :: Int -> Int
-minToSec n = case n of
-             30 -> 1800
-             60 -> 3600
-             120 -> 7200
 
 getPage :: URLString -> IO (Either CurlCode String)
 getPage uri = do

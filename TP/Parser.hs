@@ -38,6 +38,18 @@ parseTime :: Parser Int
 parseTime = do x <- nat
                return $ fromIntegral x
 
+parseTime' :: Parser WaitT
+parseTime' = do try separator
+                h <- nat
+                char 'h'
+                m <- nat
+                char 'm'
+                try separator
+                return (T (fromIntegral h) (fromIntegral m)) 
+
+waitToMin :: WaitT -> Int
+waitToMin (T h m) = h*60+m
+
 separator :: Parser ()
 separator = 
     spaces 
@@ -48,9 +60,18 @@ separator =
     <|> do spaces
            return ()
 
-parseAll :: Parser [Notification]
-parseAll = do xs <- sepBy parseNot separator
-              return xs
+--parseAll :: Parser [Notification]
+--parseAll = do xs <- sepBy parseNot separator
+--              return xs
+
+parseAll = do ys <- do try separator
+                       x <- try parseNot
+                       try separator
+                       xs <- try parseAll
+                       return (x:xs)
+              return ys                   
+           <|> do try eof 
+                  return []
                
 parseNot :: Parser Notification
 parseNot = do
@@ -58,11 +79,11 @@ parseNot = do
     name <- many1 letter
     separator
     reserved untyped "get"
-    attr <- parseAttr <?> "Se esperaba id,text,class o src"
+    attr <- parseAttr <?> "id,text,class o src"
     separator
     reserved untyped "where"
     separator
-    attrC <- parseAttr <?> "Se esperaba id,text,class o src"
+    attrC <- parseAttr <?> "id,text,class o src"
     separator
     reservedOp untyped "="
     cond <- manyTill anyChar newline
@@ -73,13 +94,13 @@ parseNot = do
     ct <- manyTill anyChar newline
     separator
     reserved untyped "every"
-    time <- parseTime 
+    time <- parseTime' 
     separator
     reserved untyped "type"
-    ty <- parseNType <?> "Se esperaba log,print o mail"
+    ty <- parseNType <?> "log,print o mail"
     separator
     reserved untyped "from"
     url <- manyTill anyChar newline
-    return (N name time attr (attrC,cond) ct url ty)
+    return (N name (waitToMin time) attr (attrC,cond) ct url ty)
     
 

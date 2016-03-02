@@ -38,9 +38,8 @@ main = do
     p <- parseFromFile parseAll (unwords args)
     case p of
         Left err -> print err    
-        Right xs -> do let list = map (\n -> (n,time n)) xs
+        Right xs -> do let list = map (\n -> (n,time n,0)) xs
                        runStateT timePQ list >> return () 
-
 
 
 {-

@@ -15,13 +15,13 @@ inFile n a = do
     let nn = name n
     let nfile = nn++".log"
     t <- getCurrentTime
-    appendFile nfile (nn++" "++show(statements a)++" "++show t++"\n")
+    appendFile nfile ("Nombre: "++nn++" | Respuesta: "++show(statements a)++" | Hora: "++show t++"\n")
 
 printIt :: Notification -> Answer -> IO ()
 printIt n a = do
     let nn = name n
     t <- getCurrentTime
-    putStrLn $ nn++" "++show(statements a)++" "++show t
+    putStrLn $ "Nombre: "++nn++" | Respuesta: "++show(statements a)++" | Hora: "++show t
 
 okAnswer :: Notification -> Answer -> IO ()
 okAnswer n a = do
@@ -35,6 +35,6 @@ errorT n err = do
     let nfile = nn++".log"
     t <- getCurrentTime
     case (ntype n) of
-        Log -> appendFile nfile (nn++" "++curlError err++show t++"\n")
-        Print -> putStrLn $ nn++" "++curlError err++" "++show t
+        Log -> appendFile nfile ("ERROR: "++nn++" || "++curlError err++" "++show t++"\n")
+        Print -> putStrLn $ "ERROR: "++nn++" || "++curlError err++" || "++show t
         

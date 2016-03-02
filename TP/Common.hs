@@ -1,6 +1,8 @@
 module Common where
 
 type Tags = String
+type Tup = (Notification,Int,Int)
+type Env = [Tup]
 
 data Attr = Href
           | Text

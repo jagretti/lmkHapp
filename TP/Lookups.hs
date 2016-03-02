@@ -38,7 +38,7 @@ lookUpAtAt n page = do
 
 --Consigue Texto con determinado Texto (cueck)
 lookUpTT n page = do
-    u <- runX $ page >>> css (tags (tag n)) //> hasText (isInfixOf (snd $ cond n)) >>> getText
+    u <- runX $ page >>> css (tags (tag n)) >>> hasText (isInfixOf (snd $ cond n)) >>> getText
     return u
 
 --Consigue Texto con determinado atributo
