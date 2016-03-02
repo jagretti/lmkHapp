@@ -47,9 +47,11 @@ parseTime' = do try separator
                 try separator
                 return (T (fromIntegral h) (fromIntegral m)) 
 
+--Pasa de WaitT a tiempo en MINUTOS
 waitToMin :: WaitT -> Int
 waitToMin (T h m) = h*60+m
 
+--Parsea espacios, tabs, \n
 separator :: Parser ()
 separator = 
     spaces 
@@ -64,6 +66,7 @@ separator =
 --parseAll = do xs <- sepBy parseNot separator
 --              return xs
 
+--Parser de todo un archivo conf con notificaciones
 parseAll = do ys <- do try separator
                        x <- try parseNot
                        try separator
@@ -72,7 +75,8 @@ parseAll = do ys <- do try separator
               return ys                   
            <|> do try eof 
                   return []
-               
+
+--Parsea una notificacion            
 parseNot :: Parser Notification
 parseNot = do
     reserved untyped "new"
@@ -86,12 +90,12 @@ parseNot = do
     attrC <- parseAttr <?> "id,text,class o src"
     separator
     reservedOp untyped "="
-    cond <- manyTill anyChar newline
+    cond <- manyTill anyChar (char ';')
     separator
     tag <- reserved untyped "tag"
     separator
     reservedOp untyped "="
-    ct <- manyTill anyChar newline
+    ct <- manyTill anyChar (char ';')
     separator
     reserved untyped "every"
     time <- parseTime' 
@@ -100,7 +104,7 @@ parseNot = do
     ty <- parseNType <?> "log,print o mail"
     separator
     reserved untyped "from"
-    url <- manyTill anyChar newline
+    url <- manyTill anyChar (char ';')
     return (N name (waitToMin time) attr (attrC,cond) ct url ty)
     
 

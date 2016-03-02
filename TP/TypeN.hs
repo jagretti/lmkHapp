@@ -10,6 +10,7 @@ import Data.Time.Calendar
 import Data.Time
 import Network.Curl
 
+--Escribe Answer en un archivo .log
 inFile :: Notification -> Answer -> IO ()
 inFile n a = do
     let nn = name n
@@ -17,18 +18,21 @@ inFile n a = do
     t <- getCurrentTime
     appendFile nfile ("Nombre: "++nn++" | Respuesta: "++show(statements a)++" | Hora: "++show t++"\n")
 
+--Imprime por pantalla el Answer
 printIt :: Notification -> Answer -> IO ()
 printIt n a = do
     let nn = name n
     t <- getCurrentTime
     putStrLn $ "Nombre: "++nn++" | Respuesta: "++show(statements a)++" | Hora: "++show t
 
+--Elige como mostrarle al usuario la respuesta
 okAnswer :: Notification -> Answer -> IO ()
 okAnswer n a = do
     case (ntype n) of   
         Log -> inFile n a
         Print -> printIt n a
 
+--Elige como mostrarle al usuario el error
 errorT :: Notification -> CurlCode -> IO ()
 errorT n err = do
     let nn = name n

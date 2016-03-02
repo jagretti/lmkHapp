@@ -55,6 +55,7 @@ bigLookUp n = do
                       return $ Right ans
         Left r -> return $ Left r
 
+--Hace la busquedas
 go n p = do
     let at = att n
     let atc = fst (cond n)

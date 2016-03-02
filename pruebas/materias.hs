@@ -4,7 +4,7 @@ import Network.URI
 import Text.HandsomeSoup
 import Data.List
 
-weatherDataURL = "http://www.fceia.unr.edu.ar/lcc/r313/"
+weatherDataURL = "http://www.ole.com.ar/"
 
 retrieveWeatherData = do
   case parseURI weatherDataURL of
@@ -27,7 +27,7 @@ parseXML doc = readString [ withValidate no
 main = do 
     doc <- retrieveWeatherData
     xml <- return $ parseXML doc
-    result <- runX (xml //> hasText (isInfixOf "Parcial") >>> getText)
+    result <- runX (xml //> hasText (isInfixOf "Vasco") >>> getText)
 --    result <- runX (xml //> deep (hasText (isInfixOf "Parcial")) >>> getText)
     
 --          result <- runX (xml >>> css "body" >>> removeAllWhiteSpace //> getText)
