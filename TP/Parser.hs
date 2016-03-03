@@ -32,7 +32,9 @@ parseNType = do string "print"
              <|> do string "log"
                     return Log
              <|> do string "mail"
-                    return Mail
+                    space   
+                    m <- manyTill anyChar (char ';') --MEJORAR!!!
+                    return (Mail m)
 
 parseTime :: Parser Int
 parseTime = do x <- nat

@@ -14,7 +14,7 @@ import Control.Monad.Trans.State.Lazy
 import System.Exit
 import Network.Curl
 
---Loop principal con una Lista de prioridad. La prioridad la tiene Tup con el menor tiempo cambiante
+--Loop principal con una Lista de prioridad. La prioridad la tiene la Tup con el menor tiempo cambiante
 timePQ :: StateT Env IO ()
 timePQ = do 
     ys <- get
@@ -46,29 +46,6 @@ handleError t err = do
         other -> do io $ errorT n other
                     deleteT t
                     return () 
-
-{-
-handleError' :: Tup -> CurlCode -> StateT Env IO ()
-handleError' t err = do
-    let n = fst' t
-    case err of
-        CurlRecvError -> if thd' t > 10 then deleteT t >> return else io $ loop n
-        other -> do io $ errorT n other
-                    deleteT t
-                    return ()
-        where loop n = do x <- bigLookUp n
-                          case x of
-                              Left CurlRecvError -> loop n
-                              Left err -> do io $ errorT n err
-                                             deleteT t
-                                             return ()
-                              Right (A n []) -> do setDefault t
-                                                   io $ print ("no encontre nada de "++n) --borrar
-                                                   return ()
-                              Right (A n xs) -> do io $ okAnswer (fst' t) (A n xs)
-                                                   io $ print ("borro por que ya encontre "++n) --borrar
-                                                   deleteT t
--}                                              
                                 
 --Suma 1 a la cantidad de errores de la Tup dada
 tick :: Tup -> StateT Env IO ()

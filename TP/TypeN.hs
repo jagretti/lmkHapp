@@ -9,6 +9,8 @@ import Data.Time.Clock
 import Data.Time.Calendar
 import Data.Time
 import Network.Curl
+import Mail
+
 
 --Escribe Answer en un archivo .log
 inFile :: Notification -> Answer -> IO ()
@@ -31,6 +33,7 @@ okAnswer n a = do
     case (ntype n) of   
         Log -> inFile n a
         Print -> printIt n a
+        Mail m -> sendMail m (name n) (concat (statements a)) --MEJORAR!!
 
 --Elige como mostrarle al usuario el error
 errorT :: Notification -> CurlCode -> IO ()
@@ -40,5 +43,5 @@ errorT n err = do
     t <- getCurrentTime
     case (ntype n) of
         Log -> appendFile nfile ("ERROR: "++nn++" || "++curlError err++" "++show t++"\n")
-        Print -> putStrLn $ "ERROR: "++nn++" || "++curlError err++" || "++show t
+        _ -> putStrLn $ "ERROR: "++nn++" || "++curlError err++" || "++show t --No mando al mail si hay error!
         

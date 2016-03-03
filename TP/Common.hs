@@ -12,7 +12,7 @@ data Attr = Href
 
 data NType = Log
            | Print 
-           | Mail deriving (Show,Eq)
+           | Mail String deriving (Show,Eq)
 
 data WaitT = T { hours :: Int
                , minutes :: Int } deriving (Show,Eq)

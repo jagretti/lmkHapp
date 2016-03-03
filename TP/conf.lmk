@@ -78,4 +78,27 @@ new SMN
     type print
     from http://www.smn.gov.ar/?mod=pron&id=4&provincia=Santa%20Fe&ciudad=Rosario;
 
+new Subdivx
+    get href where
+    href = bajar;
+    tag = any;
+    every 0h1m
+    type log
+    from http://www.subdivx.com/X46X-subtitulos.html;
+
+new Lineal
+    get text where
+    text = consulta;
+    tag = any;
+    every 0h1m
+    type log
+    from http://www.fceia.unr.edu.ar/lcc/r211/;
+
+
+
+
+
+
+
+
 

@@ -5,7 +5,7 @@ import Ghtml
 import Pretty
 
 import Network.Curl
-import Text.HandsomeSoup
+import HandsomeSoup
 import Text.XML.HXT.Core
 import Data.List
 
@@ -33,17 +33,17 @@ lookUpAtT n page = do
 --Consigue Atributo con condicion de otro atributo
 lookUpAtAt n page = do
     let at = translate $ att n
-    t <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") ! at
+    t <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"|="++(snd (cond n))++"]") ! at
     return t
 
---Consigue Texto con determinado Texto (cueck)
+--Consigue Texto con determinado Texto
 lookUpTT n page = do
     u <- runX $ page >>> css (tags (tag n)) >>> hasText (isInfixOf (snd $ cond n)) >>> getText
     return u
 
 --Consigue Texto con determinado atributo
 lookUpTAt n page = do
-    u <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"~="++(snd (cond n))++"]") //> getText
+    u <- runX $ page >>> css ((tags (tag n))++"["++(translate $ fst (cond n))++"|="++(snd (cond n))++"]") //> getText
     return u
 
 --Hace la seleccion de lookUps solo
