@@ -1,5 +1,5 @@
 module HandsomeSoup (openUrl, fromUrl, parseHtml, (!), css) where
-
+---ESTA LIBRERIA ESTA COPIADA DE UNA EXISTENTE, SOLO MODIFIQUE LINEA 89
 import Text.XML.HXT.Core
 import Network.HTTP
 import Network.URI
@@ -86,5 +86,6 @@ _fromSelectors (s:selectors) = foldl (\acc selector -> make acc selector) (make 
 -- | Used internally to match attribute selectors like @ [att|=val] @.
 -- From: http://www.w3.org/TR/CSS2/selector.html
 -- "Represents an element with the att attribute, its value either being exactly "val" or beginning with "val" immediately followed by '-'".
-headMatch value attrValue = value == attrValue || value `isInfixOf` attrValue
+headMatch value attrValue = value == attrValue || value `isInfixOf` attrValue --Antes de isInfixOf decia isPrefixOf, pero de esta forma es un poco mejor
     where first = head . words $ attrValue
+

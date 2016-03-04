@@ -2,14 +2,11 @@ module TypeN where
 
 import Common
 import Ghtml
+import Mail
 
 import System.IO
-import System.Directory
-import Data.Time.Clock
-import Data.Time.Calendar
 import Data.Time
 import Network.Curl
-import Mail
 
 
 --Escribe Answer en un archivo .log
@@ -33,9 +30,9 @@ okAnswer n a = do
     case (ntype n) of   
         Log -> inFile n a
         Print -> printIt n a
-        Mail m -> sendMail m (name n) (concat (statements a)) --MEJORAR!!
+        Mail m -> sendMail m ("Notificacion : "++name n) ("Respuesta: \n"++show (statements a)) --MEJORAR!!
 
---Elige como mostrarle al usuario el error
+--Elige como mostrarle al usuario el error, Si hay un error de una notificacion que se tiene que mandar por mail, solo se muestra por pantalla
 errorT :: Notification -> CurlCode -> IO ()
 errorT n err = do
     let nn = name n

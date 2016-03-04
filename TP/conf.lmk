@@ -1,104 +1,106 @@
-new Parcial
+
+new Practica
     get text where
-    text = Parcial;
+    text = Semantica;
     tag = any;
-    every 0h2m
-    type log   
-    from http://www.fceia.unr.edu.ar/lcc/r313/;        
+    every 0h2m;
+    type log;   
+    from http://www.fceia.unr.edu.ar/lcc/r313/archivos.php;        
 
 new WikiHow
     get class where
     id = nav_messages;
     tag = any;
-    every 0h4m
-    type log
+    every 0h4m;
+    type log;
     from http://es.wikihow.com/decidirte-entre-la-PS4-y-el-Xbox-One;
 
 new Ole
     get text where
     text = OléTevé;
     tag = any;
-    every 0h5m
-    type log
+    every 0h5m;
+    type log;
     from http://www.ole.com.ar/;
 
 new NodeJs
     get text where
     text = utilitarian;
     tag = any;
-    every 0h1m
-    type print
+    every 0h1m;
+    type print;
     from https://openclassrooms.com/courses/ultra-fast-applications-using-node-js/node-js-what-is-it-for-exactly;
 
 new Groupon
     get href where
     text = Atención;
     tag = any;
-    every 0h3m
-    type log
+    every 0h3m;
+    type log;
     from https://www.groupon.com.ar/getaways;
 
 new WSchool
     get href where
     text = LEARN;
     tag = any;
-    every 0h10m
-    type log
+    every 0h10m;
+    type log;
     from http://www.w3schools.com/default.asp;
 
 new IMDB
     get text where
-    text = Godless;          
+    text = Indie;          
     tag = any;           
-    every 0h6m
-    type log
+    every 0h6m;
+    type log;
     from http://www.imdb.com/;
 
 new RealHaskell
     get id where
     text = JSON;
     tag = any;
-    every 0h8m
-    type log
+    every 0h8m;
+    type log;
     from http://book.realworldhaskell.org/read/using-parsec.html;
 
 new Hackage
     get href where
     text = processTopDown;
     tag = any;
-    every 0h1m
-    type print
+    every 0h1m;
+    type print;
     from https://hackage.haskell.org/package/hxt-9.3.1.15/docs/Text-XML-HXT-Arrow-XmlArrow.html;
 
 new SMN
     get text where
     text = Inestable;
     tag = any;
-    every 0h9m
-    type print
+    every 0h9m;
+    type print;
     from http://www.smn.gov.ar/?mod=pron&id=4&provincia=Santa%20Fe&ciudad=Rosario;
 
 new Subdivx
     get href where
     href = bajar;
     tag = any;
-    every 0h1m
-    type log
+    every 0h1m;
+    type print;
     from http://www.subdivx.com/X46X-subtitulos.html;
 
 new Lineal
     get text where
     text = consulta;
     tag = any;
-    every 0h1m
-    type log
+    every 0h1m;
+    type log;
     from http://www.fceia.unr.edu.ar/lcc/r211/;
 
-
-
-
-
-
-
+new Estudiantil
+    get class where
+    text = Buscar;
+    tag = any;
+    every 0h7m;
+    type print;
+    from http://www.fceia.unr.edu.ar/estudiantil/index.php/component/content/article?layout=edit&id=99;
 
 

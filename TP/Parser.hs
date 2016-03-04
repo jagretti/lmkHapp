@@ -15,39 +15,47 @@ untyped = makeTokenParser (haskellStyle { identStart = letter <|> char '_',
                 
 
 parseAttr :: Parser Attr
-parseAttr = do string "href"
-               return Href
-            <|> do string "id"
-                   return Id
-            <|> do string "text"
-                   return Text
-            <|> do string "class"
-                   return Class
-            <|> do string "src"
-                   return Src
+parseAttr = do try (do string "href"
+                       return Href
+                    <|> do string "id"
+                           return Id
+                    <|> do string "text"
+                           return Text
+                    <|> do string "class"
+                           return Class
+                    <|> do string "src"
+                           return Src)
+            <|> fail "Fallo, revise el atributo pedido"
+           
 
 parseNType :: Parser NType
-parseNType = do string "print"
-                return Print
-             <|> do string "log"
-                    return Log
-             <|> do string "mail"
-                    space   
-                    m <- manyTill anyChar (char ';') --MEJORAR!!!
-                    return (Mail m)
+parseNType = do try (do string "print"
+                        char ';'
+                        return Print
+                    <|> do string "log"
+                           char ';'
+                           return Log
+                    <|> do string "mail"
+                           space   
+                           m <- parseAny --MEJORAR!!!
+                           return (Mail m))
+             <|> fail "Fallo, revise el Tipo de la notificacion"
 
-parseTime :: Parser Int
-parseTime = do x <- nat
-               return $ fromIntegral x
+parseAny :: Parser String
+parseAny = do try (do x <- manyTill anyChar (char ';')
+                      return x)
+           <|> fail "Fallo, revise la notificacion"
 
 parseTime' :: Parser WaitT
-parseTime' = do try separator
-                h <- nat
-                char 'h'
-                m <- nat
-                char 'm'
-                try separator
-                return (T (fromIntegral h) (fromIntegral m)) 
+parseTime' = do try (do try separator
+                        h <- nat
+                        char 'h' <?> "h"
+                        m <- nat
+                        char 'm' <?> "m"
+                        char ';'
+                        try separator
+                        return (T (fromIntegral h) (fromIntegral m)))
+             <|> fail "Fallo, revise el tiempo dado"
 
 --Pasa de WaitT a tiempo en MINUTOS
 waitToMin :: WaitT -> Int
@@ -64,10 +72,6 @@ separator =
     <|> do spaces
            return ()
 
---parseAll :: Parser [Notification]
---parseAll = do xs <- sepBy parseNot separator
---              return xs
-
 --Parser de todo un archivo conf con notificaciones
 parseAll = do ys <- do try separator
                        x <- try parseNot
@@ -78,35 +82,36 @@ parseAll = do ys <- do try separator
            <|> do try eof 
                   return []
 
---Parsea una notificacion            
+--Parsea una notificacion
+--(*)Puse el ; por que con newline, podria quedar un espacio dando vuelta y se parsearia            
 parseNot :: Parser Notification
 parseNot = do
     reserved untyped "new"
-    name <- many1 letter
+    name <- many1 letter   --El nombre de las notificaciones solo puede ser en Letras
     separator
-    reserved untyped "get"
-    attr <- parseAttr <?> "id,text,class o src"
+    reserved untyped "get"  <?> "get"
+    attr <- parseAttr  <?> "id,text,class,href o src"
     separator
-    reserved untyped "where"
+    reserved untyped "where" <?> "where"
     separator
-    attrC <- parseAttr <?> "id,text,class o src"
+    attrC <- parseAttr  <?> "id,text,class o src"
     separator
-    reservedOp untyped "="
-    cond <- manyTill anyChar (char ';')
+    reservedOp untyped "=" 
+    cond <- parseAny         --(*)
     separator
-    tag <- reserved untyped "tag"
+    tag <- reserved untyped "tag" <?> "tag"
     separator
-    reservedOp untyped "="
-    ct <- manyTill anyChar (char ';')
+    reservedOp untyped "=" 
+    ct <- parseAny           --(*)
     separator
-    reserved untyped "every"
-    time <- parseTime' 
+    reserved untyped "every" <?> "every"
+    time <- parseTime'
     separator
-    reserved untyped "type"
+    reserved untyped "type" <?> "type"
     ty <- parseNType <?> "log,print o mail"
     separator
-    reserved untyped "from"
-    url <- manyTill anyChar (char ';')
+    reserved untyped "from" <?> "from"
+    url <- parseAny          --(*)
     return (N name (waitToMin time) attr (attrC,cond) ct url ty)
     
 

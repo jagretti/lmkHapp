@@ -2,10 +2,10 @@ module Ghtml where
 
 import Common
 
-import Control.Concurrent
 import Text.XML.HXT.Core
 import Network.Curl
 import Data.List
+
 
 --Devuelve el archivo Html como una String de Haskell, o error si lo hubo
 getPage :: URLString -> IO (Either CurlCode String)

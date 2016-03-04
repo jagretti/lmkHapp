@@ -21,7 +21,7 @@ timePQ = do
     fstTime ys
     forever $ do
     xs <- get
-    io $ print xs --borrar
+--    io $ print xs --print de seguimiento Borrar
     io $ check xs
     t <- getMinPQ
     diffAll t
@@ -31,18 +31,19 @@ timePQ = do
         Left error -> do tick t
                          handleError t error
         Right (A n []) -> do setDefault t
-                             io $ print ("no encontre nada de "++n) --borrar
+--                             io $ print ("no encontre nada de "++n) --print de seguimiento Borrar
                              return ()
         Right (A n xs) -> do io $ okAnswer (fst' t) (A n xs)
-                             io $ print ("borro por que ya encontre "++n) --borrar
+--                             io $ print ("borro por que ya encontre "++n) --print de seguimiento Borrar
                              deleteT t
 
---Maneja que hacer si hay un error
+--Maneja que hacer si hay un error, Si el error es CurlRecvError lo seteo en 0 asi lo busca rapido 5 veces seguidas,
+--si hay respuesta (vacia o no) listo, espero lo que tenga que esperar, si sigue el error a la 5ta la borro.
 handleError :: Tup -> CurlCode -> StateT Env IO ()
 handleError t err = do
     let n = fst' t
     case err of
-        CurlRecvError -> if thd' t > 4 then deleteT t >> return () else io (errorT n err) >> setT t 0 >> return () --OJO que cambie defaultT por setT!!!!!!!
+        CurlRecvError -> if thd' t > 4 then deleteT t >> return () else io (errorT n err) >> setT t 0 >> return () --uso setT
         other -> do io $ errorT n other
                     deleteT t
                     return () 
@@ -76,10 +77,9 @@ fstTime (x:xs) = do
     case n of
         Left error -> do handleError x error
                          fstTime xs
-        Right (A np []) -> do io $ print ("no recibi nada de "++np) --borrar
-                              fstTime xs
+        Right (A np []) -> do fstTime xs --io $ print ("no recibi nada de "++np) --borrar
         Right (A np ys) -> do io $ okAnswer (fst' x) (A np ys)
-                              io $ print ("borro "++np++" la encontre") --borrar
+--                              io $ print ("borro "++np++" la encontre") --borrar
                               deleteT x
                               fstTime xs
 
@@ -133,5 +133,3 @@ setT t n = do
               sett t n ((n',ti,e):xs) = if fst' t == n' then (n',n,e):xs else (n',ti,e):(sett t n xs)  
 
 
-
-        
