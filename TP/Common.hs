@@ -1,7 +1,8 @@
 module Common where
 
 type Tags = String
-type Tup = (Notification,Int,Int)
+--Tup es de la forma (Notificacion, Tiempo variable, Numero de veces con error, Respuesta anterior)
+type Tup = (Notification,Int,Int,[String])
 type Env = [Tup]
 
 data Attr = Href

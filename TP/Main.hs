@@ -18,9 +18,11 @@ import Text.Parsec.Error
 main :: IO ()
 main = do
     args <- getArgs
-    p <- parseFromFile parseAll (unwords args)
-    case p of
-        Left err -> print err
-        Right xs -> do let list = map (\n -> (n,time n,0)) xs
-                       runStateT timePQ list >> return () 
+    case args of
+        [] -> putStrLn "Inténtelo de nuevo, pasando el archivo de las notificaciones como argumento"
+        xs -> do p <- parseFromFile parseAll (unwords xs)
+                 case p of
+                     Left err -> print err
+                     Right xs -> do let list = map (\n -> (n,time n,0,[])) xs
+                                    runStateT timePQ list >> return () 
 

@@ -3,23 +3,15 @@ new Practica
     get text where
     text = Semantica;
     tag = any;
-    every 0h2m;
+    every 0h5m;
     type log;   
     from http://www.fceia.unr.edu.ar/lcc/r313/archivos.php;        
-
-new WikiHow
-    get class where
-    id = nav_messages;
-    tag = any;
-    every 0h4m;
-    type log;
-    from http://es.wikihow.com/decidirte-entre-la-PS4-y-el-Xbox-One;
 
 new Ole
     get text where
     text = OléTevé;
     tag = any;
-    every 0h5m;
+    every 0h10m;
     type log;
     from http://www.ole.com.ar/;
 
@@ -75,17 +67,9 @@ new SMN
     get text where
     text = Inestable;
     tag = any;
-    every 0h9m;
+    every 1h0m;
     type print;
     from http://www.smn.gov.ar/?mod=pron&id=4&provincia=Santa%20Fe&ciudad=Rosario;
-
-new Subdivx
-    get href where
-    href = bajar;
-    tag = any;
-    every 0h1m;
-    type print;
-    from http://www.subdivx.com/X46X-subtitulos.html;
 
 new Lineal
     get text where
@@ -99,7 +83,7 @@ new Estudiantil
     get class where
     text = Buscar;
     tag = any;
-    every 0h7m;
+    every 0h10m;
     type print;
     from http://www.fceia.unr.edu.ar/estudiantil/index.php/component/content/article?layout=edit&id=99;
 

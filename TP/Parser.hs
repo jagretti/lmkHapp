@@ -37,7 +37,7 @@ parseNType = do try (do string "print"
                            return Log
                     <|> do string "mail"
                            space   
-                           m <- parseAny --MEJORAR!!!
+                           m <- parseAny
                            return (Mail m))
              <|> fail "Fallo, revise el Tipo de la notificacion"
 
@@ -82,8 +82,7 @@ parseAll = do ys <- do try separator
            <|> do try eof 
                   return []
 
---Parsea una notificacion
---(*)Puse el ; por que con newline, podria quedar un espacio dando vuelta y se parsearia            
+--Parsea una notificacion            
 parseNot :: Parser Notification
 parseNot = do
     reserved untyped "new"
@@ -97,12 +96,12 @@ parseNot = do
     attrC <- parseAttr  <?> "id,text,class o src"
     separator
     reservedOp untyped "=" 
-    cond <- parseAny         --(*)
+    cond <- parseAny         
     separator
     tag <- reserved untyped "tag" <?> "tag"
     separator
     reservedOp untyped "=" 
-    ct <- parseAny           --(*)
+    ct <- parseAny           
     separator
     reserved untyped "every" <?> "every"
     time <- parseTime'
@@ -111,7 +110,7 @@ parseNot = do
     ty <- parseNType <?> "log,print o mail"
     separator
     reserved untyped "from" <?> "from"
-    url <- parseAny          --(*)
+    url <- parseAny          
     return (N name (waitToMin time) attr (attrC,cond) ct url ty)
     
 
