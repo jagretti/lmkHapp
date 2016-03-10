@@ -24,5 +24,5 @@ main = do
                  case p of
                      Left err -> print err
                      Right xs -> do let list = map (\n -> (n,time n,0,[])) xs
-                                    runStateT timePQ list >> return () 
+                                    runStateT timePL list >> return () 
 

@@ -15,8 +15,8 @@ import System.Exit
 import Network.Curl
 
 --Loop principal con una Lista de prioridad. La prioridad la tiene la Tup con el menor tiempo variable
-timePQ :: StateT Env IO ()
-timePQ = do 
+timePL :: StateT Env IO ()
+timePL = do 
     ys <- get
     fstTime ys
     forever $ do
@@ -24,7 +24,6 @@ timePQ = do
         io $ check xs
         t <- getMinPQ
         diffAll t
-        ys <- get
         ans <- io (waitAndLook t)
         case ans of
             Left error -> do tick t
@@ -81,7 +80,7 @@ fstTime (x:xs) = do
         Left error -> do tick x
                          handleError x error
                          fstTime xs
-        Right (A np []) -> do fstTime xs 
+        Right (A np []) -> fstTime xs 
         Right (A np ys) -> do io $ okAnswer (fst' x) (A np ys)
                               putNewAns (A np ys)
                               fstTime xs

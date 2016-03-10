@@ -65,7 +65,7 @@ new Hackage
 
 new SMN
     get text where
-    text = Inestable;
+    text = lluvia;
     tag = any;
     every 1h0m;
     type print;

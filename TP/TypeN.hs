@@ -8,7 +8,7 @@ import System.IO
 import Data.Time
 import Network.Curl
 
-
+--getCurrentTime me retorna una hora con 3 horas de mas
 timeCurrent :: IO UTCTime
 timeCurrent = do t <- getCurrentTime
                  let t1 = addUTCTime (-10800) t

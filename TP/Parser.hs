@@ -8,10 +8,10 @@ import Text.Parsec.Language
 import Data.Char
 import Network.URI (parseURI, uriToString)
 
-untyped :: TokenParser u
-untyped = makeTokenParser (haskellStyle { identStart = letter <|> char '_',
-                                          reservedNames = ["get","where","new","every","from","tag","type"],
-                                          opLetter = return ' ' })
+names :: TokenParser u
+names = makeTokenParser (haskellStyle { identStart = letter <|> char '_',
+                                        reservedNames = ["get","where","new","every","from","tag","type"],
+                                        opLetter = return ' ' })
                 
 
 parseAttr :: Parser Attr
@@ -85,31 +85,31 @@ parseAll = do ys <- do try separator
 --Parsea una notificacion            
 parseNot :: Parser Notification
 parseNot = do
-    reserved untyped "new"
+    reserved names "new"
     name <- many1 letter   --El nombre de las notificaciones solo puede ser en Letras
     separator
-    reserved untyped "get"  <?> "get"
+    reserved names "get"  <?> "get"
     attr <- parseAttr  <?> "id,text,class,href o src"
     separator
-    reserved untyped "where" <?> "where"
+    reserved names "where" <?> "where"
     separator
     attrC <- parseAttr  <?> "id,text,class o src"
     separator
-    reservedOp untyped "=" 
+    reservedOp names "=" 
     cond <- parseAny         
     separator
-    tag <- reserved untyped "tag" <?> "tag"
+    tag <- reserved names "tag" <?> "tag"
     separator
-    reservedOp untyped "=" 
+    reservedOp names "=" 
     ct <- parseAny           
     separator
-    reserved untyped "every" <?> "every"
+    reserved names "every" <?> "every"
     time <- parseTime'
     separator
-    reserved untyped "type" <?> "type"
+    reserved names "type" <?> "type"
     ty <- parseNType <?> "log,print o mail"
     separator
-    reserved untyped "from" <?> "from"
+    reserved names "from" <?> "from"
     url <- parseAny          
     return (N name (waitToMin time) attr (attrC,cond) ct url ty)
     
