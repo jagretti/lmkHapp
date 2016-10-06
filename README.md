@@ -1,3 +1,3 @@
 # lmkHapp
 
-viendo que onda
+Falta terminar, mejorar las busquedas.
